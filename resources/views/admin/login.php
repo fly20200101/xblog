@@ -10,7 +10,7 @@
     <link rel="stylesheet" href="/X-admin/css/font.css">
     <link rel="stylesheet" href="/X-admin/css/login.css">
     <link rel="stylesheet" href="/X-admin/css/xadmin.css">
-    <script type="text/javascript" src="https://cdn.bootcss.com/jquery/3.2.1/jquery.min.js"></script>
+    <script type="text/javascript" src="/X-admin/js/jquery.min.js"></script>
     <script src="/X-admin/lib/layui/layui.js" charset="utf-8"></script>
     <!--[if lt IE 9]>
     <script src="https://cdn.staticfile.org/html5shiv/r29/html5.min.js"></script>
@@ -24,9 +24,9 @@
     <div id="darkbannerwrap"></div>
 
     <form method="post" class="layui-form" >
-        <input name="username" placeholder="用户名"  type="text" lay-verify="required" class="layui-input" >
+        <input name="admin_username" placeholder="用户名"  type="text" lay-verify="required" class="layui-input" >
         <hr class="hr15">
-        <input name="password" lay-verify="required" placeholder="密码"  type="password" class="layui-input">
+        <input name="admin_login_pwd" lay-verify="required" placeholder="密码"  type="password" class="layui-input">
         <hr class="hr15">
         <input value="登录" lay-submit lay-filter="login" style="width:100%;" type="submit">
         <hr class="hr20" >
@@ -34,26 +34,28 @@
 </div>
 
 <script>
+    var csrf = "<?php echo csrf_token();?>"
     $(function  () {
         layui.use('form', function(){
             var form = layui.form;
-            // layer.msg('玩命卖萌中', function(){
-            //   //关闭后的操作
-            //   });
             //监听提交
             form.on('submit(login)', function(data){
-                // alert(888)
-                layer.msg(JSON.stringify(data.field),function(){
-                    location.href='index.html'
-                });
+                $.ajax({
+                    url:"/admin/login",
+                    method:"POST",
+                    dataType:"JSON",
+                    contentType: "application/json",
+                    headers:{'X-CSRF-TOKEN':csrf},
+                    data:JSON.stringify(data.field),
+                    success:function (e) {
+                        layer.msg(e.message)
+                    }
+                })
                 return false;
             });
         });
     })
 </script>
 <!-- 底部结束 -->
-<script>
-
-</script>
 </body>
 </html>
