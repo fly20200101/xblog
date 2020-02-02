@@ -53,6 +53,11 @@ class LoginController extends BaseController
         }
     }
 
+    /**
+     * 退出登录
+     * @param Request $request
+     * @return false|string
+     */
     public function logout(Request $request){
         if($request->ajax()){
             $act = trim($request->input('act',''));
