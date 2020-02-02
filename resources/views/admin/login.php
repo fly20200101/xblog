@@ -48,7 +48,11 @@
                     headers:{'X-CSRF-TOKEN':csrf},
                     data:JSON.stringify(data.field),
                     success:function (e) {
-                        layer.msg(e.message)
+                        if(e.status){
+                            location.href = '/admin/main'; //后台主页
+                        }else{
+                            layer.msg(e.message)
+                        }
                     }
                 })
                 return false;
