@@ -10,6 +10,7 @@
     <link rel="stylesheet" href="/X-admin/css/font.css">
     <link rel="stylesheet" href="/X-admin/css/xadmin.css">
     <!-- <link rel="stylesheet" href="./css/theme5.css"> -->
+    <script type="text/javascript" src="/X-admin/js/jquery.min.js"></script>
     <script src="/X-admin/lib/layui/layui.js" charset="utf-8"></script>
     <script type="text/javascript" src="/X-admin/js/xadmin.js"></script>
     <!-- 让IE8/9支持媒体查询，从而兼容栅格 -->
@@ -55,7 +56,7 @@
     </ul>
     <ul class="layui-nav right" lay-filter="">
         <li class="layui-nav-item">
-            <a href="javascript:;">admin</a>
+            <a href="javascript:;"><?php $admin_info = session('admin_info');echo $admin_info[0]['admin_username'];?></a>
             <dl class="layui-nav-child">
                 <!-- 二级菜单 -->
                 <dd>
@@ -63,7 +64,7 @@
                 <dd>
                     <a onclick="xadmin.open('切换帐号','http://www.baidu.com')">切换帐号</a></dd>
                 <dd>
-                    <a href="./login.html">退出</a></dd>
+                    <a onclick="logout();">退出</a></dd>
             </dl>
         </li>
         <li class="layui-nav-item to-index">
@@ -355,13 +356,29 @@
 <style id="theme_style"></style>
 <!-- 右侧主体结束 -->
 <!-- 中部结束 -->
-<script>//百度统计可去掉
-    var _hmt = _hmt || []; (function() {
-        var hm = document.createElement("script");
-        hm.src = "https://hm.baidu.com/hm.js?b393d153aeb26b46e9431fabaf0f6190";
-        var s = document.getElementsByTagName("script")[0];
-        s.parentNode.insertBefore(hm, s);
-    })();</script>
+<script>
+    var csrf = "<?php echo csrf_token();?>"
+    function logout() {
+        layer.confirm('是否要退出',function () {
+            $.ajax({
+                url:"/admin/logout",
+                method:"POST",
+                dataType:"JSON",
+                contentType: "application/json",
+                headers:{'X-CSRF-TOKEN':csrf},
+                data:JSON.stringify({'act':'logout'}),
+                success:function (e) {
+                    if(e.status){
+                        location.href = '/admin/login';
+                    }else{
+                        layer.msg(e.message)
+                    }
+                }
+            })
+        });
+
+    }
+</script>
 </body>
 
 </html>

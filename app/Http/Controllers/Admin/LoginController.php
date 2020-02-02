@@ -41,8 +41,8 @@ class LoginController extends BaseController
             if(empty($admin_login_pwd)){
                 return json_encode(['status'=>false,'code'=>800002,'message'=>'管理员密码不能为空','data'=>[]]);
             }
-            if($this->adminRepository->doLogin(['admin_username'=>$admin_username,'admin_login_pwd'=>md5($admin_login_pwd)])){
 
+            if($this->adminRepository->doLogin(['admin_username'=>$admin_username,'admin_login_pwd'=>md5($admin_login_pwd)])){
                 return json_encode(['status'=>true,'code'=>900001,'message'=>'登录成功','data'=>[]]);
             }else{
                 return json_encode(['status'=>false,'code'=>800003,'message'=>'账号密码错误','data'=>[]]);
@@ -53,5 +53,15 @@ class LoginController extends BaseController
         }
     }
 
-
+    public function logout(Request $request){
+        if($request->ajax()){
+            $act = trim($request->input('act',''));
+            if($act == 'logout'){
+                session()->forget('admin_info');
+                return json_encode(['status'=>true,'code'=>900002,'message'=>'退出成功','data'=>[]]);
+            }else{
+                return json_encode(['status'=>false,'code'=>800004,'message'=>'退出失败','data'=>[]]);
+            }
+        }
+    }
 }
