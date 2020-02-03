@@ -31,8 +31,13 @@ class ArticleController extends BaseController
      * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
      */
     public function ArticleTypeList(Request $request){
+        if($request->ajax()){
+            $list = $this->articleTypeRepository->getPageList(10, [], 'at_id');
+            return json_encode(["code"=>0,"msg"=>'成功',"data"=>$list['data']]);
+        }else{
+            return view('admin/article_type_list');
+        }
 
-        return view('admin/article_type_list');
     }
 
     /**

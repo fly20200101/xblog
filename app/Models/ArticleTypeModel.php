@@ -13,4 +13,10 @@ class ArticleTypeModel extends Model
     public function add(array $data){
         return $this->insert($data);
     }
+
+    public function list($page, $filter, $sort){
+        return $this->where($filter)->orderBy($sort)->paginate($page)->toArray();
+    }
+
+
 }
