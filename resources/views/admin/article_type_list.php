@@ -36,13 +36,9 @@
         <div class="layui-col-md12">
             <div class="layui-card">
                 <div class="layui-card-body ">
-                    <form class="layui-form layui-col-space5">
                         <div class="layui-input-inline layui-show-xs-block">
-                            <input class="layui-input" placeholder="分类名" name="cate_name"></div>
-                        <div class="layui-input-inline layui-show-xs-block">
-                            <button class="layui-btn"  lay-submit="" lay-filter="addArticleType"><i class="layui-icon"></i>增加</button>
+                            <button class="layui-btn"  lay-submit="" lay-filter="addArticleType" onclick="addArticleType();"><i class="layui-icon"></i>增加</button>
                         </div>
-                    </form>
                     <hr>
                     <blockquote class="layui-elem-quote">每个tr 上有两个属性 cate-id='1' 当前分类id fid='0' 父级id ,顶级分类为 0，有子分类的前面加收缩图标<i class="layui-icon x-show" status='true'>&#xe623;</i></blockquote>
                 </div>
@@ -260,6 +256,17 @@
             id = $(el).attr('cate-id');
             cateIds.push(id);
             getCateId(id);
+        });
+    }
+
+    // 添加分类
+    function addArticleType() {
+        layer.open({
+            type: 2
+            , title: '添加文章分类'
+            , content: '/admin/add_article_type_list'
+            , area: ['600px', '600px']
+            , maxmin: true
         });
     }
 
