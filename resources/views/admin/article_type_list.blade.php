@@ -47,36 +47,57 @@
                         <i class="layui-icon"></i>批量删除</button>
                 </div>
                 <div class="layui-card-body ">
-                    <table class="layui-table layui-form" id="demo"></table>
+                    <table class="layui-table layui-form">
+                        <thead>
+                        <tr>
+                            <th width="20">
+                                <input type="checkbox" name="" lay-skin="primary">
+                            </th>
+                            <th width="70">ID</th>
+                            <th>栏目名</th>
+                            <th width="50">排序</th>
+                            <th width="80">状态</th>
+                            <th width="250">操作</th>
+                        </thead>
+                        <tbody class="x-cate">
+                            @foreach ($list as $v)
+                            <tr cate-id='{{$v['at_id']}}' fid='{{$v['pid']}}' >
+                                <td>
+                                    <input type="checkbox" name="" lay-skin="primary">
+                                </td>
+                                <td>{{$v['at_id']}}</td>
+                                <td>
+                                    <i class="layui-icon x-show" status='true'>&#xe623;</i>
+                                    {{$v['type_name']}}
+                                </td>
+                                <td><input type="text" class="layui-input x-sort" name="order" value="1"></td>
+                                <td>
+                                    <input type="checkbox" name="switch"  lay-text="开启|停用"  checked="" lay-skin="switch">
+                                </td>
+                                <td class="td-manage">
+                                    <button class="layui-btn layui-btn layui-btn-xs"  onclick="xadmin.open('编辑','admin-edit.html')" ><i class="layui-icon">&#xe642;</i>编辑</button>
+                                    <button class="layui-btn layui-btn-warm layui-btn-xs"  onclick="xadmin.open('编辑','admin-edit.html')" ><i class="layui-icon">&#xe642;</i>添加子栏目</button>
+                                    <button class="layui-btn-danger layui-btn layui-btn-xs"  onclick="member_del(this,'要删除的id')" href="javascript:;" ><i class="layui-icon">&#xe640;</i>删除</button>
+                                </td>
+                            </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
                 </div>
                 <div class="layui-card-body ">
                     <div class="page">
                         <div>
-
+                            {!! $list->links() !!}
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 </div>
-
 <script>
-    layui.use(['form','table'], function(){
+    layui.use(['form'], function(){
         form = layui.form;
-        var table = layui.table;
-
-        //第一个实例
-        table.render({
-            elem: '#demo'
-            ,height: 312
-            ,url: '/admin/article_type_list' //数据接口
-            ,page: true //开启分页
-            ,cols: [[ //表头
-                {field: 'at_id', title: 'ID', width:80, sort: true, fixed: 'left'}
-                ,{field: 'type_name', title: '分类名', width:80}
-                ,{}
-            ]]
-        });
     });
     /*用户-删除*/
     function member_del(obj,id){

@@ -15,7 +15,7 @@ class ArticleTypeModel extends Model
     }
 
     public function list($page, $filter, $sort){
-        return $this->where($filter)->orderBy($sort)->paginate($page)->toArray();
+        return $this->where($filter)->orderBy($sort)->paginate($page);
     }
 
 

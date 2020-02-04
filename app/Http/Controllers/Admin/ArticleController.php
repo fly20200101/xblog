@@ -31,13 +31,15 @@ class ArticleController extends BaseController
      * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
      */
     public function ArticleTypeList(Request $request){
-        if($request->ajax()){
-            $list = $this->articleTypeRepository->getPageList(10, [], 'at_id');
-            return json_encode(["code"=>0,"msg"=>'成功',"data"=>$list['data']]);
-        }else{
-            return view('admin/article_type_list');
-        }
-
+//        if($request->ajax()){
+//            $list = $this->articleTypeRepository->getPageList(10, [], 'at_id');
+//            return json_encode(["code"=>0,"msg"=>'成功',"count"=>$list['total'],"data"=>$list['data']]);
+//        }else{
+//            return view('admin/article_type_list');
+//        }
+        $list = $this->articleTypeRepository->getPageList(5, [], 'at_id');
+        //echo '<pre>';print_r($list);exit;
+        return view('admin/article_type_list',['list'=>$list]);
     }
 
     /**
@@ -51,7 +53,6 @@ class ArticleController extends BaseController
             if(empty($typename)){
                 return json_encode(['status'=>false,'code'=>800005,'message'=>'分类名称不能为空','data'=>[]]);
             }
-            var_dump($typename);
             if($this->articleTypeRepository->addArticleType(['type_name'=>$typename])){
                 return json_encode(['status'=>true,'code'=>900003,'message'=>'添加分类成功','data'=>[]]);
             }else{
