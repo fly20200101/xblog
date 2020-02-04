@@ -46,24 +46,15 @@ class CommentRepository implements CommentRepositoryInterface
         return $this->cmodel->create($data);
     }
 
-    /**
-     * @return mixed
-     */
-    public function getCmodel()
-    {
-        return $this->cmodel;
-    }
 
-    /**
-     * @param mixed $cmodel
-     */
-    public function setCmodel($cmodel): void
-    {
-        $this->cmodel = $cmodel;
-    }
 
     public function getPageList($page_obj, $filter, $sort)
     {
-        $this->cmodel->getPageList($page_obj, $filter, $sort);
+        return $this->cmodel->getPageList($page_obj, $filter, $sort);
+    }
+
+    public function edit(array $map, array $data)
+    {
+        return $this->cmodel->edit($map,$data);
     }
 }

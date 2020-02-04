@@ -40,7 +40,7 @@
                             <button class="layui-btn"  lay-submit="" lay-filter="addArticleType" onclick="addArticleType();"><i class="layui-icon"></i>增加</button>
                         </div>
                     <hr>
-                    <blockquote class="layui-elem-quote">每个tr 上有两个属性 cate-id='1' 当前分类id fid='0' 父级id ,顶级分类为 0，有子分类的前面加收缩图标<i class="layui-icon x-show" status='true'>&#xe623;</i></blockquote>
+
                 </div>
                 <div class="layui-card-header">
                     <button class="layui-btn layui-btn-danger" onclick="delAll()">
@@ -70,12 +70,12 @@
                                     <i class="layui-icon x-show" status='true'>&#xe623;</i>
                                     {{$v['type_name']}}
                                 </td>
-                                <td><input type="text" class="layui-input x-sort" name="order" value="1"></td>
+                                <td><input type="text" class="layui-input x-sort" name="order" value="{{$v['sort']}}"></td>
                                 <td>
                                     <input type="checkbox" name="switch"  lay-text="开启|停用"  checked="" lay-skin="switch">
                                 </td>
                                 <td class="td-manage">
-                                    <button class="layui-btn layui-btn layui-btn-xs"  onclick="xadmin.open('编辑','admin-edit.html')" ><i class="layui-icon">&#xe642;</i>编辑</button>
+                                    <button class="layui-btn layui-btn layui-btn-xs"  onclick="editArticleType({{$v['at_id']}})" ><i class="layui-icon">&#xe642;</i>编辑</button>
                                     <button class="layui-btn layui-btn-warm layui-btn-xs"  onclick="xadmin.open('编辑','admin-edit.html')" ><i class="layui-icon">&#xe642;</i>添加子栏目</button>
                                     <button class="layui-btn-danger layui-btn layui-btn-xs"  onclick="member_del(this,'要删除的id')" href="javascript:;" ><i class="layui-icon">&#xe640;</i>删除</button>
                                 </td>
@@ -147,6 +147,17 @@
             type: 2
             , title: '添加文章分类'
             , content: '/admin/add_article_type_list'
+            , area: ['600px', '600px']
+            , maxmin: true
+        });
+    }
+
+    // 修改分类
+    function editArticleType(id) {
+        layer.open({
+            type: 2
+            , title: '编辑文章分类'
+            , content: '/admin/edit_article_type_list?at_id='+id
             , area: ['600px', '600px']
             , maxmin: true
         });

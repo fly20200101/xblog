@@ -31,14 +31,7 @@ class ArticleController extends BaseController
      * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
      */
     public function ArticleTypeList(Request $request){
-//        if($request->ajax()){
-//            $list = $this->articleTypeRepository->getPageList(10, [], 'at_id');
-//            return json_encode(["code"=>0,"msg"=>'成功',"count"=>$list['total'],"data"=>$list['data']]);
-//        }else{
-//            return view('admin/article_type_list');
-//        }
         $list = $this->articleTypeRepository->getPageList(5, [], 'at_id');
-        //echo '<pre>';print_r($list);exit;
         return view('admin/article_type_list',['list'=>$list]);
     }
 
@@ -60,6 +53,28 @@ class ArticleController extends BaseController
             }
         }else{
             return view('admin/add_article_type');
+        }
+    }
+
+    public function editArticleType(Request $request){
+        if($request->ajax()){
+            $type_name = trim($request->input('type_name',''));
+            $sort = trim($request->input('sort',0));
+            $at_id = trim($request->input('at_id'));
+            if(empty($type_name)){
+                return json_encode(['status'=>false,'code'=>800005,'message'=>'分类名称不能为空','data'=>[]]);
+            }
+
+            if($this->articleTypeRepository->editArticleType(['at_id'=>$at_id],['type_name'=>$type_name,'sort'=>$sort])){
+                return json_encode(['status'=>true,'code'=>900004,'message'=>'修改分类成功','data'=>[]]);
+            }else{
+                return json_encode(['status'=>false,'code'=>800007,'message'=>'修改分类成功','data'=>[]]);
+            }
+
+        }else{
+            $at_id = trim($request->input('at_id'));
+            $type_info = $this->articleTypeRepository->getRowById($at_id);
+            return view('admin/edit_article_type',['data'=>$type_info[0]]);
         }
     }
 }

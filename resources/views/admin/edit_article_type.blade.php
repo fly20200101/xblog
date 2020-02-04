@@ -29,6 +29,7 @@
                 <div class="layui-input-inline">
                     <input type="text" id="type_name" name="type_name" required="" lay-verify="required"
                            autocomplete="off" class="layui-input" value="{{$data['type_name']}}">
+                    <input type="hidden" name="at_id" id="at_id" value="{{$data['at_id']}}">
                 </div>
                 <div class="layui-form-mid layui-word-aux">
                     <span class="x-red">*</span>分类名称
@@ -39,8 +40,8 @@
                     <span class="x-red">*</span>排序
                 </label>
                 <div class="layui-input-inline">
-                    <input type="text" id="sort" name="type_name" required="" lay-verify="required"
-                           autocomplete="off" class="layui-input">
+                    <input type="text" id="sort" name="sort" required="" lay-verify="required"
+                           autocomplete="off" class="layui-input" value="{{$data['sort']}}">
                 </div>
                 <div class="layui-form-mid layui-word-aux">
                     <span class="x-red">*</span>排序
@@ -50,7 +51,7 @@
                 <label for="L_repass" class="layui-form-label">
                 </label>
                 <button  class="layui-btn" lay-filter="add_type_name" lay-submit="">
-                    增加
+                    修改
                 </button>
             </div>
         </form>
@@ -63,27 +64,12 @@
             $ = layui.jquery;
             var form = layui.form,
                 layer = layui.layer;
-
-            //自定义验证规则
-            form.verify({
-                nikename: function(value) {
-                    if (value.length < 5) {
-                        return '昵称至少得5个字符啊';
-                    }
-                },
-                pass: [/(.+){6,12}$/, '密码必须6到12位'],
-                repass: function(value) {
-                    if ($('#L_pass').val() != $('#L_repass').val()) {
-                        return '两次密码不一致';
-                    }
-                }
-            });
             var csrf = "<?php echo csrf_token();?>"
             //监听提交
             form.on('submit(add_type_name)',
                 function(data) {
                     $.ajax({
-                        url:'/admin/add_article_type_list',
+                        url:'/admin/edit_article_type_list',
                         method:"POST",
                         dataType:"JSON",
                         contentType: "application/json",

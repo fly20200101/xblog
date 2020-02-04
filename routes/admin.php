@@ -5,4 +5,7 @@ Route::group(['middleware'=>['web','admin.login']],function (){
     Route::get('/main','Admin\MainController@index');
     Route::get('/article_type_list','Admin\ArticleController@ArticleTypeList');
     Route::match(['post','get'],'/add_article_type_list','Admin\ArticleController@addArticleType');
+    Route::match(['post','get'],'/edit_article_type_list','Admin\ArticleController@editArticleType');
+
+    //Route::get('/edit_article_type_list','Admin\ArticleController@editArticleType');
 });

@@ -41,4 +41,12 @@ class ArticleTypeRepository extends CommentRepository
     public function getPageList($page_obj, $filter, $sort){
         return $this->cmodel->list($page_obj, $filter, $sort);
     }
+
+    public function getArticleTypeInfo(int $id){
+        return $this->cmodel->getRowById($id);
+    }
+
+    public function editArticleType(array $map,array $data){
+        return $this->cmodel->edit($map,$data);
+    }
 }

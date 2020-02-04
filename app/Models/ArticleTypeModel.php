@@ -18,5 +18,11 @@ class ArticleTypeModel extends Model
         return $this->where($filter)->orderBy($sort)->paginate($page);
     }
 
+    public function getRowById(int $id){
+        return $this->where(['at_id'=>$id])->get()->toArray();
+    }
 
+    public function edit(array $map,array $data){
+        return $this->where($map)->update($data);
+    }
 }
