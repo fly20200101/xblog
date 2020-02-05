@@ -2,9 +2,10 @@
 
 namespace App\Models;
 
+use App\Helpers\PageHelper;
 use Illuminate\Database\Eloquent\Model;
 
-class ArticleTypeModel extends Model
+class ArticleTypeModel extends BaseModel
 {
     protected $table = 'fb_article_type';
 
@@ -14,8 +15,29 @@ class ArticleTypeModel extends Model
         return $this->insert($data);
     }
 
-    public function list($page, $filter, $sort){
-        return $this->where($filter)->orderBy($sort)->paginate($page);
+    public function getPageList(PageHelper $page_obj = null, $filter = array(), $sort = array()){
+        $where = self::getWhere($filter);
+        $order = "";
+        $limit = "";
+        if (empty($sort)) {
+            $sort['sort_field'] = "at_id";
+            $sort['sort_order'] = "desc";
+        }
+        if (empty($page_obj)) {
+            return array();
+        }
+
+        $count = $this->count($where);
+
+        $page_obj->set_count($count);
+
+        if (empty($count)) {
+            return array();
+        }
+        $limit = $page_obj->page_size;
+        $page = $page_obj->curr_page;
+
+        return $this->basePageList($where, $page, $limit,$sort);
     }
 
     public function getRowById(int $id){
@@ -24,5 +46,24 @@ class ArticleTypeModel extends Model
 
     public function edit(array $map,array $data){
         return $this->where($map)->update($data);
+    }
+
+    public static function getWhere($filter){
+        $where = [];
+
+        if (isset($filter['type_name']) AND $filter['type_name']) {
+            $where[] = ['type_name', 'LIKE', '%'.$filter['type_name'].'%'];
+        }
+
+        return $where;
+    }
+
+    public function count($where,$infield='',$inarray=[]){
+        if($infield && $inarray){
+            return $this->where($where)->wherein($infield,$inarray)->count();
+        }else{
+            return $this->where($where)->count();
+        }
+
     }
 }

@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
  * Class AdminModel
  * @package App\Models
  */
-class AdminModel extends Model
+class AdminModel extends BaseModel
 {
     /**
      * @var string
