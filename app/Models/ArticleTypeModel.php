@@ -4,13 +4,14 @@ namespace App\Models;
 
 use App\Helpers\PageHelper;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class ArticleTypeModel extends BaseModel
 {
-    protected $table = 'fb_article_type';
+    protected $table = 'fb_article_type_models';
 
     protected $primaryKey = 'at_id';
-
+    use SoftDeletes;
     public function add(array $data){
         return $this->insert($data);
     }
@@ -60,10 +61,13 @@ class ArticleTypeModel extends BaseModel
 
     public function count($where,$infield='',$inarray=[]){
         if($infield && $inarray){
-            return $this->where($where)->wherein($infield,$inarray)->count();
+            return $this->where($where)->wherein($infield,$inarray)->whereNull('deleted_at')->count();
         }else{
-            return $this->where($where)->count();
+            return $this->where($where)->whereNull('deleted_at')->count();
         }
+    }
 
+    public function del(array $map){
+        return $this->where($map)->delete();
     }
 }

@@ -37,7 +37,7 @@
             <div class="layui-card">
                 <div class="layui-card-body ">
                         <div class="layui-input-inline layui-show-xs-block">
-                            <button class="layui-btn"  lay-submit="" lay-filter="addArticleType" onclick="addArticleType();"><i class="layui-icon"></i>增加</button>
+                            <button class="layui-btn"  lay-submit="" onclick="addArticleType()"><i class="layui-icon"></i>增加</button>
                         </div>
                     <hr>
 
@@ -47,11 +47,13 @@
                         <i class="layui-icon"></i>批量删除</button>
                 </div>
                 <div class="layui-card-body ">
-                    <table class="layui-table layui-form" id="demo" lay-filter="test"></table>
+                    <table class="layui-table layui-form" id="demo" lay-filter="article_type_table"></table>
                     <script type="text/html" id="table-operate-action">
                         <a class="layui-btn layui-btn-normal layui-btn-xs" lay-event="edit"><i
                                     class="layui-icon layui-icon-edit"></i>编辑</a>
-                        <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del"><i class="layui-icon layui-icon-delete"></i>删除</a>
+                        <a class="layui-btn layui-btn-normal layui-btn-xs" lay-event="addChildType"><i
+                                    class="layui-icon layui-icon-edit"></i>添加子分类</a>
+                        <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="delType"><i class="layui-icon layui-icon-delete"></i>删除</a>
                     </script>
                 </div>
             </div>
@@ -59,68 +61,73 @@
     </div>
 </div>
 <script>
+
     layui.use(['form','table'], function(){
+        var csrf = "{{ csrf_token() }}"
         form = layui.form;
         var table = layui.table;
         //第一个实例
         table.render({
             elem: '#demo'
-            ,height: 312
             ,url: '/admin/article_type_list' //数据接口
             , page: true
             ,limit:5
+            ,smartReloadModel: true
             ,cols: [[ //表头
-                {field: 'at_id', title: 'ID', width:80, sort: true, fixed: 'left'}
-                ,{field: 'type_name', title: '分类名', width:80}
-                ,{field: 'sort', title: '排序', width:80, sort: true},
-                , {title: '操作', align: 'center', width: 150, fixed: 'right', toolbar: '#table-operate-action'}
+                {field: 'at_id', title: 'ID', sort: true, fixed: 'left'}
+                ,{field: 'type_name', title: '分类名'}
+                ,{field: 'sort', title: '排序',sort: true},
+                ,{title: '操作', toolbar: '#table-operate-action'}
             ]],
             text: {none: '未查询到数据^_^'}
         });
-    });
-    /*用户-删除*/
-    function member_del(obj,id){
-        layer.confirm('确认要删除吗？',function(index){
-            //发异步删除数据
-            $(obj).parents("tr").remove();
-            layer.msg('已删除!',{icon:1,time:1000});
-        });
-    }
+        table.on('tool(article_type_table)', function (obj) {
+            var data = obj.data; //获得当前行数据
+            var layEvent = obj.event; //获得 lay-event 对应的值（也可以是表头的 event 参数对应的值）
+            var tr = obj.tr; //获得当前行 tr 的DOM对象
+            if (layEvent === "edit") {
+                layer.open({
+                    type: 2
+                    , title: '编辑文章分类'
+                    , content: '/admin/edit_article_type_list?at_id='+data.at_id
+                    , area: ['600px', '600px']
+                    , maxmin: true
+                });
+            }
 
-    // 分类展开收起的分类的逻辑
-    //
-    $(function(){
-        $("tbody.x-cate tr[fid!='0']").hide();
-        // 栏目多级显示效果
-        $('.x-show').click(function () {
-            if($(this).attr('status')=='true'){
-                $(this).html('&#xe625;');
-                $(this).attr('status','false');
-                cateId = $(this).parents('tr').attr('cate-id');
-                $("tbody tr[fid="+cateId+"]").show();
-            }else{
-                cateIds = [];
-                $(this).html('&#xe623;');
-                $(this).attr('status','true');
-                cateId = $(this).parents('tr').attr('cate-id');
-                getCateId(cateId);
-                for (var i in cateIds) {
-                    $("tbody tr[cate-id="+cateIds[i]+"]").hide().find('.x-show').html('&#xe623;').attr('status','true');
-                }
+
+            if(layEvent === "addChildType"){
+                layer.open({
+                    type: 2
+                    , title: '添加文章分类'
+                    , content: '/admin/add_child_article_type?at_id='+data.at_id
+                    , area: ['600px', '600px']
+                    , maxmin: true
+                });
+            }
+
+            if(layEvent === "delType"){
+                layer.confirm('确认要删除吗？',function(index){
+                    console.log(index)
+                    $.ajax({
+                        url:'/admin/delArticleType',
+                        method:'post',
+                        dataType:'json',
+                        headers:{'X-CSRF-TOKEN':csrf},
+                        contentType: "application/json",
+                        data:JSON.stringify({'act':'del','at_id':index}),
+                        success:function (e) {
+                            if(e.status){
+                                window.reload()
+                            }else{
+                                layui.msg(e.message)
+                            }
+                        }
+                    })
+                });
             }
         })
-    })
-
-    var cateIds = [];
-    function getCateId(cateId) {
-        $("tbody tr[fid="+cateId+"]").each(function(index, el) {
-            id = $(el).attr('cate-id');
-            cateIds.push(id);
-            getCateId(id);
-        });
-    }
-
-    // 添加分类
+    });
     function addArticleType() {
         layer.open({
             type: 2
@@ -130,26 +137,12 @@
             , maxmin: true
         });
     }
-
-    // 修改分类
-    function editArticleType(id) {
-        layer.open({
-            type: 2
-            , title: '编辑文章分类'
-            , content: '/admin/edit_article_type_list?at_id='+id
-            , area: ['600px', '600px']
-            , maxmin: true
-        });
-    }
-
-    // 添加子分类
-    function addChildArticleType(id) {
-        layer.open({
-            type: 2
-            , title: '添加文章分类'
-            , content: '/admin/add_child_article_type?at_id='+id
-            , area: ['600px', '600px']
-            , maxmin: true
+    var cateIds = [];
+    function getCateId(cateId) {
+        $("tbody tr[fid="+cateId+"]").each(function(index, el) {
+            id = $(el).attr('cate-id');
+            cateIds.push(id);
+            getCateId(id);
         });
     }
 

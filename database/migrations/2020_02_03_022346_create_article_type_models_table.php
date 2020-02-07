@@ -13,9 +13,15 @@ class CreateArticleTypeModelsTable extends Migration
      */
     public function up()
     {
-        Schema::create('article_type_models', function (Blueprint $table) {
-            $table->bigIncrements('id');
+        Schema::create('fb_article_type_models', function (Blueprint $table) {
+            $table->tinyIncrements('at_id')->comment('文章分类id');
+            $table->string('type_name',30)->default('')->comment('文章分类名称');
+            $table->char('status',1)->default('1')->comment('状态，1正常2冻结');
+            $table->unsignedTinyInteger('pid',0);
+            $table->unsignedTinyInteger('sort');
+            $table->dateTime('deleted_at');
             $table->timestamps();
+            $table->engine = 'InnoDB';
         });
     }
 

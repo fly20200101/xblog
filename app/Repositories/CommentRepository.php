@@ -57,4 +57,8 @@ class CommentRepository implements CommentRepositoryInterface
     {
         return $this->cmodel->edit($map,$data);
     }
+
+    public function del(array $map){
+        return $this->cmodel->del($map);
+    }
 }

@@ -13,11 +13,11 @@ class BaseModel extends Model
             $sort['sort_order'] = "desc";
         }
         if($infield && $inarray){
-            return  $this->where($where)->wherein($infield,$inarray)
+            return  $this->where($where)->wherein($infield,$inarray)->whereNull('deleted_at')
                 ->orderBy($sort['sort_field'],$sort['sort_order'])
                 ->limit($pageSize)->offset(($currPage - 1) * $pageSize)->get()->toArray();
         }else{
-            return $this->where($where)
+            return $this->where($where)->whereNull('deleted_at')
                 ->orderBy($sort['sort_field'],$sort['sort_order'])
                 ->limit($pageSize)->offset(($currPage - 1) * $pageSize)->get()->toArray();
         }

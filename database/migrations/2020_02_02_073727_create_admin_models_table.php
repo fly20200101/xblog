@@ -13,7 +13,7 @@ class CreateAdminModelsTable extends Migration
      */
     public function up()
     {
-        Schema::create('admin_models', function (Blueprint $table) {
+        Schema::create('fb_admin_models', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->timestamps();
         });
