@@ -130,4 +130,22 @@ class ArticleController extends BaseController
             return json_encode(['status'=>false,'code'=>800010,'message'=>'删除失败','data'=>[]]);
         }
     }
+
+    // 回收站列表
+
+    public function article_type_recycle_bin(Request $request){
+        if($request->ajax()){
+            $page = intval($request->input("page", 1));
+            $pageSize = intval($request->input("limit", 10));
+            $page_obj = new PageHelper($page, $pageSize);
+
+            $filter = [];
+            $sort = array();
+            $list = $this->articleTypeRepository->getPageList($page_obj, $filter, $sort);
+            return json_encode(['status'=>true,'code'=>0,'count'=>count($list),'data'=>$list,'msg'=>'']);
+
+        }else{
+            return view('admin/article_type_recycle_bin_list');
+        }
+    }
 }
