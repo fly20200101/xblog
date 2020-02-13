@@ -116,7 +116,14 @@ return [
     | such as APC or Memcached. Laravel makes it easy to dig right in.
     |
     */
-
+    'mongodb' => [
+        'driver'   => 'mongodb',
+        'host'     => ['127.0.0.1:27017'],
+        'database' => env('MONGODB_DATABASE',"blog"),
+        'username' => env('MONGODB_USERNAME',""),
+        'password' => env('MONGODB_PASSWORD',""),
+        'fetch' => PDO::FETCH_ASSOC,
+    ],
     'redis' => [
 
         'client' => env('REDIS_CLIENT', 'phpredis'),

@@ -3,8 +3,11 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Jobs\AdminLogJob;
+use App\Models\AdminLogModel;
 use App\Repositories\AdminRepository;
 use Illuminate\Http\Request;
+use Illuminate\Support\Arr;
 
 /**
  * Class LoginController
@@ -43,6 +46,20 @@ class LoginController extends BaseController
             }
 
             if($this->adminRepository->doLogin(['admin_username'=>$admin_username,'admin_login_pwd'=>md5($admin_login_pwd)])){
+                AdminLogJob::dispatch([
+                    "op_type_id" => AdminLogModel::OPERATE_TYPE_LOGIN,       //操作类型 ，增加，删除， 修改，登录
+                    "op_user_id" => $this->uid, //操作者id
+                    "op_user_name" => $admin_username,//操作者账号
+                    "be_object_id" => '',//操作对象id
+                    "be_object_name" => '', //被操作对象名字或者简称
+                    "level" => AdminLogModel::LEVEL_INFO, //日志级别
+                    "title" => "管理员{$admin_username}登录",//日志标题
+                    "desc" => "", //日志描述
+                    "op_time" => time(),//事件执行时间
+                    "op_ip" => 0,//日志操作者ip
+                    "op_url" => $request->getRequestUri(),
+                    "input" => [],
+                ]);
                 return json_encode(['status'=>true,'code'=>900001,'message'=>'登录成功','data'=>[]]);
             }else{
                 return json_encode(['status'=>false,'code'=>800003,'message'=>'账号密码错误','data'=>[]]);
