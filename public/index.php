@@ -6,7 +6,7 @@
  * @package  Laravel
  * @author   Taylor Otwell <taylor@laravel.com>
  */
-
+// test2
 define('LARAVEL_START', microtime(true));
 // 测试1
 /*
