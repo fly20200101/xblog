@@ -36,6 +36,7 @@ class ArticleController extends BaseController
     }
 
     /**
+     * 文章类型列表
      * @param Request $request
      * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
      */
@@ -91,6 +92,11 @@ class ArticleController extends BaseController
         }
     }
 
+    /**
+     * 编辑分类
+     * @param Request $request
+     * @return false|\Illuminate\Contracts\View\Factory|\Illuminate\View\View|string
+     */
     public function editArticleType(Request $request){
         if($request->ajax()){
             $type_name = trim($request->input('type_name',''));
@@ -113,6 +119,11 @@ class ArticleController extends BaseController
         }
     }
 
+    /**
+     * 加入子分类
+     * @param Request $request
+     * @return false|\Illuminate\Contracts\View\Factory|\Illuminate\View\View|string
+     */
     public function addChildArticleType(Request $request){
         if($request->ajax()){
             $type_name = trim($request->input('type_name',''));
@@ -136,6 +147,11 @@ class ArticleController extends BaseController
         }
     }
 
+    /**
+     * 软删除分类
+     * @param Request $request
+     * @return false|string
+     */
     public function delArticleType(Request $request){
         $act = trim($request->input('act',''));
         $at_id = trim($request->input('at_id',''));
@@ -155,6 +171,11 @@ class ArticleController extends BaseController
     }
 
 
+    /**
+     * 回收站 - 列表
+     * @param Request $request
+     * @return false|\Illuminate\Contracts\View\Factory|\Illuminate\View\View|string
+     */
     public function articleTypeRecycleBinList(Request $request){
         if($request->ajax()){
             $page = intval($request->input("page", 1));
@@ -185,6 +206,11 @@ class ArticleController extends BaseController
         }
     }
 
+    /**
+     * 回收站 - 还原
+     * @param Request $request
+     * @return false|string
+     */
     public function reduction_article_type(Request $request){
         if($request->ajax()){
             $do_act = $request->input('act','');
