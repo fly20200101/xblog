@@ -53,4 +53,22 @@ class ArticleTypeRepository extends CommentRepository
     public function del(array $map){
         return $this->cmodel->del($map);
     }
+
+    public function reduction(array $map)
+    {
+        return $this->cmodel->reduction($map);
+    }
+
+    public function with_trashed(array $map=[]){
+        return $this->cmodel->with_trashed($map);
+    }
+
+    public function only_trashed(array $map=[]){
+        return $this->cmodel->only_trashed($map);
+    }
+
+    public function getAll(){
+        return $this->cmodel->getAll();
+    }
+
 }

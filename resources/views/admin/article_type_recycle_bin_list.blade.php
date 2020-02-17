@@ -35,28 +35,15 @@
     <div class="layui-row layui-col-space15">
         <div class="layui-col-md12">
             <div class="layui-card">
-                <div class="layui-card-body ">
-                        <div class="layui-input-inline layui-show-xs-block">
-                            <button class="layui-btn"  lay-submit="" onclick="addArticleType()"><i class="layui-icon"></i>增加</button>
-                        </div>
-                        <div class="layui-input-inline layui-show-xs-block" style="float: right;">
-                            <button class="layui-btn layui-btn-normal"  lay-submit="" onclick="recycleBin()"><i class="layui-icon"></i>回收站</button>
-                        </div>
-                    <hr>
 
-                </div>
-                <div class="layui-card-header">
-                    <button class="layui-btn layui-btn-danger" onclick="delAll()">
-                        <i class="layui-icon"></i>批量删除</button>
-                </div>
+<!--                <div class="layui-card-header">-->
+<!--                    <button class="layui-btn layui-btn-danger" onclick="delAll()">-->
+<!--                        <i class="layui-icon"></i>批量删除</button>-->
+<!--                </div>-->
                 <div class="layui-card-body ">
                     <table class="layui-table layui-form" id="demo" lay-filter="article_type_table"></table>
                     <script type="text/html" id="table-operate-action">
-                        <a class="layui-btn layui-btn-normal layui-btn-xs" lay-event="edit"><i
-                                    class="layui-icon layui-icon-edit"></i>编辑</a>
-                        <a class="layui-btn layui-btn-normal layui-btn-xs" lay-event="addChildType"><i
-                                    class="layui-icon layui-icon-edit"></i>添加子分类</a>
-                        <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="delType"><i class="layui-icon layui-icon-delete"></i>删除</a>
+                        <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="reduction"><i class="layui-icon layui-icon-delete"></i>还原</a>
                     </script>
                 </div>
             </div>
@@ -72,14 +59,13 @@
         //第一个实例
         table.render({
             elem: '#demo'
-            ,url: '/admin/article_type_list' //数据接口
+            ,url: '/admin/article_type_recycle_bin_list' //数据接口
             , page: true
             ,limit:5
             ,smartReloadModel: true
             ,cols: [[ //表头
                 {field: 'at_id', title: 'ID', sort: true, fixed: 'left'}
                 ,{field: 'type_name', title: '分类名'}
-                ,{field: 'sort', title: '排序',sort: true},
                 ,{title: '操作', toolbar: '#table-operate-action'}
             ]],
             text: {none: '未查询到数据^_^'}
@@ -88,36 +74,16 @@
             var data = obj.data; //获得当前行数据
             var layEvent = obj.event; //获得 lay-event 对应的值（也可以是表头的 event 参数对应的值）
             var tr = obj.tr; //获得当前行 tr 的DOM对象
-            if (layEvent === "edit") {
-                layer.open({
-                    type: 2
-                    , title: '编辑文章分类'
-                    , content: '/admin/edit_article_type_list?at_id='+data.at_id
-                    , area: ['600px', '600px']
-                    , maxmin: true
-                });
-            }
-
-
-            if(layEvent === "addChildType"){
-                layer.open({
-                    type: 2
-                    , title: '添加文章分类'
-                    , content: '/admin/add_child_article_type?at_id='+data.at_id
-                    , area: ['600px', '600px']
-                    , maxmin: true
-                });
-            }
-
-            if(layEvent === "delType"){
-                layer.confirm('确认要删除吗？',function(index){
+            if(layEvent === "reduction"){
+                console.log(data)
+                layer.confirm('确认要还原吗？',function(index){
                     $.ajax({
-                        url:'/admin/delArticleType',
+                        url:'/admin/reduction_article_type',
                         method:'post',
                         dataType:'json',
                         headers:{'X-CSRF-TOKEN':csrf},
                         contentType: "application/json",
-                        data:JSON.stringify({'act':'del','at_id':data.at_id}),
+                        data:JSON.stringify({'act':'reduction','at_id':data.at_id}),
                         success:function (e) {
                             if(e.status){
                                 table.reload('demo'); //数据刷新
@@ -132,25 +98,6 @@
             }
         })
     });
-    function addArticleType() {
-        layer.open({
-            type: 2
-            , title: '添加文章分类'
-            , content: '/admin/add_article_type_list'
-            , area: ['600px', '600px']
-            , maxmin: true
-        });
-    }
-
-    function recycleBin() {
-        layer.open({
-            type: 2
-            , title: '回收站'
-            , content: '/admin/article_type_recycle_bin_list'
-            , area: ['800px', '600px']
-            , maxmin: true
-        })
-    }
     var cateIds = [];
     function getCateId(cateId) {
         $("tbody tr[fid="+cateId+"]").each(function(index, el) {
@@ -163,3 +110,4 @@
 </script>
 </body>
 </html>
+

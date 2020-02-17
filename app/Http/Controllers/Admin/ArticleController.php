@@ -8,6 +8,7 @@ use App\Http\Controllers\Controller;
 use App\Jobs\AdminLogJob;
 use App\Models\AdminLogModel;
 use App\Repositories\ArticleTypeRepository;
+use App\Traits\ArraySort;
 use Illuminate\Http\Request;
 use App\Traits\JsonTrait;
 use Illuminate\Support\Arr;
@@ -19,6 +20,7 @@ use Illuminate\Support\Arr;
 class ArticleController extends BaseController
 {
     use JsonTrait;
+    use ArraySort;
     /**
      * @var ArticleTypeRepository
      */
@@ -40,13 +42,28 @@ class ArticleController extends BaseController
     public function ArticleTypeList(Request $request){
         if($request->ajax()){
             $page = intval($request->input("page", 1));
-            $pageSize = intval($request->input("limit", 10));
-            $page_obj = new PageHelper($page, $pageSize);
+            $list = $this->articleTypeRepository->getAll();
+            $count = count($list);
+            $limit = $request->input('limit',10);
+            $start=($page-1)*$limit;
+            $total_page = ceil($count / $limit);
+            $field = $request->input('field','');
+            $order = $request->input('order','');
+            if($field != '' && $order != ''){
+                $list = $this->ArraySort($list,$field,$order);
+                $list = array_slice($list,$start,$limit);
+            }else{
+                $list = array_slice($list,$start,$limit);
+            }
 
-            $filter = [];
-            $sort = array();
-            $list = $this->articleTypeRepository->getPageList($page_obj, $filter, $sort);
-            return json_encode(['status'=>true,'code'=>0,'count'=>count($list),'data'=>$list,'msg'=>'']);
+            $other = array(
+                "count" => $count,
+                "curr_page" => $page,
+                "total_page" => $total_page,
+                "total" => $count,
+            );
+            return json_encode(['status'=>true,'code'=>0,'count'=>$count,'data'=>$list,'msg'=>'','other'=>$other]);
+
 
         }else{
             return view('admin/article_type_list');
@@ -130,41 +147,57 @@ class ArticleController extends BaseController
         }
         if($this->articleTypeRepository->del(['at_id'=>$at_id])){
             $info = $this->articleTypeRepository->getRowById($at_id);
-            AdminLogJob::dispatch([
-                "op_type_id" => AdminLogModel::OPERATE_TYPE_DELETE,       //操作类型 ，增加，删除， 修改，登录
-                "op_user_id" => $this->uid, //操作者id
-                "op_user_name" => Arr::get($this->userInfo, 'account', ''),//操作者账号
-                "be_object_id" => $at_id,//操作对象id
-                "be_object_name" => '名字' . Arr::get($mongo_data, 'type_name', ''), //被操作对象名字或者简称
-                "level" => AdminLogModel::LEVEL_WARNING, //日志级别
-                "title" => '删除文章分类',//日志标题
-                "desc" => "", //日志描述
-                "op_time" => time(),//事件执行时间
-                "op_ip" => $this->clientIp,//日志操作者ip
-                "op_url" => $request->getRequestUri(),
-                "input" => [],
-            ]);
+
             return json_encode(['status'=>true,'code'=>900006,'message'=>'删除成功','data'=>[]]);
         }else{
             return json_encode(['status'=>false,'code'=>800010,'message'=>'删除失败','data'=>[]]);
         }
     }
 
-    // 回收站列表
 
-    public function article_type_recycle_bin(Request $request){
+    public function articleTypeRecycleBinList(Request $request){
         if($request->ajax()){
             $page = intval($request->input("page", 1));
             $pageSize = intval($request->input("limit", 10));
-            $page_obj = new PageHelper($page, $pageSize);
+            $list = $this->articleTypeRepository->only_trashed();
+            $count = count($list);
+            $limit = $request->input('limit',10);
+            $start=($page-1)*$limit;
+            $total_page = ceil($count / $limit);
+            $field = $request->input('field','');
+            $order = $request->input('order','');
+            if($field != '' && $order != ''){
+                $list = $this->ArraySort($list,$field,$order);
+                $list = array_slice($list,$start,$limit);
+            }else{
+                $list = array_slice($list,$start,$limit);
+            }
 
-            $filter = [];
-            $sort = array();
-            $list = $this->articleTypeRepository->getPageList($page_obj, $filter, $sort);
-            return json_encode(['status'=>true,'code'=>0,'count'=>count($list),'data'=>$list,'msg'=>'']);
-
+            $other = array(
+                "count" => $count,
+                "curr_page" => $page,
+                "total_page" => $total_page,
+                "total" => $count,
+            );
+            return json_encode(['status'=>true,'code'=>0,'count'=>$count,'data'=>$list,'msg'=>'','other'=>$other]);
         }else{
             return view('admin/article_type_recycle_bin_list');
+        }
+    }
+
+    public function reduction_article_type(Request $request){
+        if($request->ajax()){
+            $do_act = $request->input('act','');
+            $id = $request->input('at_id','');
+            if(empty($do_act) || $do_act !== 'reduction'){
+                return json_encode(['status'=>false,'code'=>800011,'message'=>'参数错误','data'=>[]]);
+            }else{
+                if($this->articleTypeRepository->reduction(['at_id'=>$id])){
+                    return json_encode(['status'=>true,'code'=>900007,'message'=>'还原成功','data'=>[]]);
+                }else{
+                    return json_encode(['status'=>false,'code'=>800011,'message'=>'还原失败','data'=>[]]);
+                }
+            }
         }
     }
 }

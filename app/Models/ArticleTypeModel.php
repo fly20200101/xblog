@@ -70,4 +70,20 @@ class ArticleTypeModel extends BaseModel
     public function del(array $map){
         return $this->where($map)->delete();
     }
+
+    public function reduction(array $map){
+        return $this->where($map)->restore();
+    }
+
+    public function with_trashed(array $map){
+        return $this->where($map)->withTrashed()->get()->toArray();
+    }
+
+    public function only_trashed(array $map=[]){
+        return $this->where($map)->onlyTrashed()->get()->toArray();
+    }
+
+    public function getAll(){
+        return $this->select()->get()->toArray();
+    }
 }
