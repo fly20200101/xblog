@@ -10,4 +10,7 @@ Route::group(['middleware'=>['web','admin.login']],function (){
     Route::post('/delArticleType','Admin\ArticleController@delArticleType');
     Route::get('/article_type_recycle_bin_list','Admin\ArticleController@articleTypeRecycleBinList');
     Route::post('/reduction_article_type','Admin\ArticleController@reduction_article_type');
+    Route::match(['post','get'],'/article_list','Admin\ArticleController@articleList');
+    Route::match(['post','get'],'/add_article','Admin\ArticleController@createArticle');
+    Route::match(['post','get'],'/edit_article','Admin\ArticleController@editArticle');
 });

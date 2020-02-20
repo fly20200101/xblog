@@ -7,6 +7,7 @@ use App\Helpers\PageHelper;
 use App\Http\Controllers\Controller;
 use App\Jobs\AdminLogJob;
 use App\Models\AdminLogModel;
+use App\Repositories\ArticleRepository;
 use App\Repositories\ArticleTypeRepository;
 use App\Traits\ArraySort;
 use Illuminate\Http\Request;
@@ -25,14 +26,20 @@ class ArticleController extends BaseController
      * @var ArticleTypeRepository
      */
     protected $articleTypeRepository;
+    /**
+     * @var ArticleRepository
+     */
+    protected $articleRepository;
 
     /**
      * ArticleController constructor.
      * @param ArticleTypeRepository $articleTypeRepository
+     * @param ArticleRepository $articleRepository
      */
-    public function __construct(ArticleTypeRepository $articleTypeRepository)
+    public function __construct(ArticleTypeRepository $articleTypeRepository,ArticleRepository $articleRepository)
     {
         $this->articleTypeRepository = $articleTypeRepository;
+        $this->articleRepository = $articleRepository;
     }
 
     /**
@@ -224,6 +231,79 @@ class ArticleController extends BaseController
                     return json_encode(['status'=>false,'code'=>800011,'message'=>'还原失败','data'=>[]]);
                 }
             }
+        }
+    }
+
+    /**
+     * @param Request $request
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     */
+    public function articleList(Request $request){
+        if($request->ajax()){
+            $page = intval($request->input("page", 1));
+            $list = $this->articleRepository->getAll();
+            $count = count($list);
+            $limit = $request->input('limit',10);
+            $start=($page-1)*$limit;
+            $total_page = ceil($count / $limit);
+            $field = $request->input('field','');
+            $order = $request->input('order','');
+            if($field != '' && $order != ''){
+                $list = $this->ArraySort($list,$field,$order);
+                $list = array_slice($list,$start,$limit);
+            }else{
+                $list = array_slice($list,$start,$limit);
+            }
+
+            $other = array(
+                "count" => $count,
+                "curr_page" => $page,
+                "total_page" => $total_page,
+                "total" => $count,
+            );
+            return json_encode(['status'=>true,'code'=>0,'count'=>$count,'data'=>$list,'msg'=>'','other'=>$other]);
+        }else{
+            return view("admin/article/article_list");
+        }
+    }
+
+    /**
+     * @param Request $request
+     * @return false|\Illuminate\Contracts\View\Factory|\Illuminate\View\View|string
+     */
+    public function createArticle(Request $request){
+        if($request->ajax()){
+            $title = trim($request->input('title',''));
+            $content = $request->input('content','');
+            $at_id = intval($request->input('at_id',0));
+            if($at_id == 0 ){
+                return json_encode(['status'=>false,'code'=>800014,'message'=>'分类不能为空','data'=>[]]);
+            }
+            if(empty($title)){
+                return json_encode(['status'=>false,'code'=>800012,'message'=>'标题不能为空','data'=>[]]);
+            }
+            if(empty($content)){
+                return json_encode(['status'=>false,'code'=>800013,'message'=>'内容不能为空','data'=>[]]);
+            }
+            if($this->articleRepository->addArticle(['title'=>$title,'create_time'=>date('Y-m-d H:i:s'),'at_id'=>$at_id,'article_content'=>$content])){
+                return json_encode(['status'=>true,'code'=>900007,'message'=>'发布成功','data'=>[]]);
+            }else{
+                return json_encode(['status'=>false,'code'=>800015,'message'=>'发布失败','data'=>[]]);
+            }
+        }else{
+            $article_type_list = $this->articleTypeRepository->getAll();
+            return view('admin/article/create_article',['data'=>$article_type_list]);
+        }
+    }
+
+    public function editArticle(Request $request){
+        if($request->ajax()){
+
+        }else{
+            $id = intval($request->input('id',0));
+            $info = $this->articleRepository->getRowById($id);
+            $article_type_list = $this->articleTypeRepository->getAll();
+            return view('admin.article.edit_article',['info'=>$info,'data'=>$article_type_list]);
         }
     }
 }
