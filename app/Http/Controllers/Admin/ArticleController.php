@@ -298,12 +298,102 @@ class ArticleController extends BaseController
 
     public function editArticle(Request $request){
         if($request->ajax()){
-
+            $id = intval($request->input('id',0));
+            $title = trim($request->input('title',''));
+            $content = $request->input('content','');
+            $at_id = intval($request->input('at_id',0));
+            if($at_id == 0 ){
+                return json_encode(['status'=>false,'code'=>800014,'message'=>'分类不能为空','data'=>[]]);
+            }
+            if(empty($title)){
+                return json_encode(['status'=>false,'code'=>800012,'message'=>'标题不能为空','data'=>[]]);
+            }
+            if(empty($content)){
+                return json_encode(['status'=>false,'code'=>800013,'message'=>'内容不能为空','data'=>[]]);
+            }
+            if($this->articleRepository->editArticle(['id'=>$id],['title'=>$title,'at_id'=>$at_id,'article_content'=>$content])){
+                return json_encode(['status'=>true,'code'=>900007,'message'=>'发布成功','data'=>[]]);
+            }else{
+                return json_encode(['status'=>false,'code'=>800015,'message'=>'发布失败','data'=>[]]);
+            }
         }else{
             $id = intval($request->input('id',0));
             $info = $this->articleRepository->getRowById($id);
             $article_type_list = $this->articleTypeRepository->getAll();
             return view('admin.article.edit_article',['info'=>$info,'data'=>$article_type_list]);
+        }
+    }
+
+    public function delArticle(Request $request){
+        $act = trim($request->input('act',''));
+        $id = trim($request->input('id',''));
+        if(empty($act) || $act !== 'del'){
+            return json_encode(['status'=>false,'code'=>800009,'message'=>'参数错误','data'=>[]]);
+        }
+        if(empty($id)){
+            return json_encode(['status'=>false,'code'=>800009,'message'=>'参数错误','data'=>[]]);
+        }
+
+        if($this->articleRepository->del(['id'=>$id])){
+            return json_encode(['status'=>true,'code'=>900006,'message'=>'删除成功','data'=>[]]);
+        }else{
+            return json_encode(['status'=>false,'code'=>800010,'message'=>'删除失败','data'=>[]]);
+        }
+    }
+
+    /**
+     * 回收站 - 列表
+     * @param Request $request
+     * @return false|\Illuminate\Contracts\View\Factory|\Illuminate\View\View|string
+     */
+    public function articleRecycleBinList(Request $request){
+        if($request->ajax()){
+            $page = intval($request->input("page", 1));
+            $pageSize = intval($request->input("limit", 10));
+            $list = $this->articleRepository->only_trashed();
+            $count = count($list);
+            $limit = $request->input('limit',10);
+            $start=($page-1)*$limit;
+            $total_page = ceil($count / $limit);
+            $field = $request->input('field','');
+            $order = $request->input('order','');
+            if($field != '' && $order != ''){
+                $list = $this->ArraySort($list,$field,$order);
+                $list = array_slice($list,$start,$limit);
+            }else{
+                $list = array_slice($list,$start,$limit);
+            }
+
+            $other = array(
+                "count" => $count,
+                "curr_page" => $page,
+                "total_page" => $total_page,
+                "total" => $count,
+            );
+            return json_encode(['status'=>true,'code'=>0,'count'=>$count,'data'=>$list,'msg'=>'','other'=>$other]);
+        }else{
+            return view('admin/article/article_recycle_bin_list');
+        }
+    }
+
+    /**
+     * 回收站 - 还原
+     * @param Request $request
+     * @return false|string
+     */
+    public function reduction_article(Request $request){
+        if($request->ajax()){
+            $do_act = $request->input('act','');
+            $id = $request->input('id','');
+            if(empty($do_act) || $do_act !== 'reduction'){
+                return json_encode(['status'=>false,'code'=>800011,'message'=>'参数错误','data'=>[]]);
+            }else{
+                if($this->articleRepository->reduction(['id'=>$id])){
+                    return json_encode(['status'=>true,'code'=>900007,'message'=>'还原成功','data'=>[]]);
+                }else{
+                    return json_encode(['status'=>false,'code'=>800011,'message'=>'还原失败','data'=>[]]);
+                }
+            }
         }
     }
 }

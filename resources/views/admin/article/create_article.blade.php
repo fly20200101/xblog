@@ -28,9 +28,9 @@
                 <label for="at_id" class="layui-form-label">
                     <span class="x-red">*</span>文章分类</label>
                 <div class="layui-input-inline">
-                    <select name="at_id" id="at_id">
+                    <select name="at_id" id="at_id" >
                         @foreach($data as $k=>$v)
-                        <option value="{{$v['at_id']}}">{{$v['type_name']}}</option>
+                        <option value="{{$v['at_id']}}" style="z-index: 101;">{{$v['type_name']}}</option>
                         @endforeach
                     </select>
                 </div>
@@ -53,6 +53,7 @@
                 var E = window.wangEditor
                 var editor = new E('#editor')
                 // 或者 var editor = new E( document.getElementById('editor') )
+                editor.customConfig.zIndex = 100
                 editor.create()
 
             </script>
@@ -100,7 +101,6 @@
                             }
                         }
                     })
-                    //发异步，把数据提交给php
                     return false;
                 });
 

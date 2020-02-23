@@ -21,7 +21,7 @@ class ArticleModel extends BaseModel
         $order = "";
         $limit = "";
         if (empty($sort)) {
-            $sort['sort_field'] = "at_id";
+            $sort['sort_field'] = "id";
             $sort['sort_order'] = "desc";
         }
         if (empty($page_obj)) {
@@ -42,7 +42,7 @@ class ArticleModel extends BaseModel
     }
 
     public function getRowById(int $id){
-        $res =  $this->where(['at_id'=>$id])->get()->toArray();
+        $res =  $this->where(['id'=>$id])->get()->toArray();
         if(!empty($res)){
             return $res[0];
         }else{

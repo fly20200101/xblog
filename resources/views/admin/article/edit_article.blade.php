@@ -31,9 +31,10 @@
                     <select name="at_id" id="at_id">
                         @foreach($data as $k=>$v)
                             @if($v['at_id'] == $info['at_id'])
-                            <option value="{{$v['at_id']}}" selected>{{$v['type_name']}}</option>
+                                {{$v['at_id']}}2
+                            <option value="{{$v['at_id']}}" selected="selected">{{$v['type_name']}}{{$info['at_id']}}</option>
                             @else
-                                <option value="{{$v['at_id']}}" >{{$v['type_name']}}</option>
+                                <option value="{{$v['at_id']}}">{{$v['type_name']}}</option>
                             @endif
                         @endforeach
                     </select>
@@ -49,21 +50,27 @@
                 </div>
             </div>
             <hr>
-            <textarea id="demo" style="display: none;"></textarea>
-            <script>
-                layui.use('layedit', function(){
-                    var layedit = layui.layedit;
-                    layedit.build('demo'); //建立编辑器
-                });
+            <div id="editor">
+            </div>
+            <script type="text/javascript" src="/js/wangeditor.js"></script>
+            <script type="text/javascript">
+                var E = window.wangEditor
+                var editor = new E('#editor')
+                // 或者 var editor = new E( document.getElementById('editor') )
+                editor.customConfig.zIndex = 100
+                editor.create()
+                editor.txt.html('<?php echo $info["article_content"];?>')
             </script>
+
+
 
             <hr>
 
             <div class="layui-form-item">
                 <label for="L_repass" class="layui-form-label">
                 </label>
-                <button  class="layui-btn" lay-filter="add_type_name" lay-submit="">
-                    增加
+                <button  class="layui-btn" lay-filter="edit_type_name" lay-submit="">
+                    保存
                 </button>
             </div>
         </form>
@@ -78,12 +85,13 @@
                 layer = layui.layer;
             var csrf = "<?php echo csrf_token();?>"
             //监听提交
-            form.on('submit(add_type_name)',
+            form.on('submit(edit_type_name)',
                 function(data) {
                     var content = editor.txt.html();
                     data.field.content = content
+                    data.field.id = {{$info['id']}}
                     $.ajax({
-                        url:'/admin/add_article',
+                        url:'/admin/edit_article',
                         method:"POST",
                         dataType:"JSON",
                         contentType: "application/json",

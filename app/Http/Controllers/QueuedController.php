@@ -7,7 +7,6 @@ use App\Jobs\Queue;
 class QueuedController extends Controller
 {
     public function Test(){
-
         $arr=array(
             'time'=>time()
         );
